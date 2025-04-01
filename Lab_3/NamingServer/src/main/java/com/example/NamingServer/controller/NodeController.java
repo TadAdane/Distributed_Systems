@@ -18,7 +18,7 @@ public class NodeController {
     // Hashing function (node name -> 0 to 32768)
     private int hashNodeName(String nodeName) {
         int hash = nodeName.hashCode(); // can be negative
-        return (int) (((long) hashCode + MAX) * 32768 / ((long) MAX + Math.abs((long) MIN)));
+        return (int) (((long) hash + MAX) * 32768 / ((long) MAX + Math.abs((long) MIN)));
     }
 
     // Sample endpoint to add a node
