@@ -82,6 +82,13 @@ public class NodeController {
         return "File location for " + filename + " (hash: " + fileHash + ") is node with hash " + selectedKey + " → IP: " + ip;
     }
 
+    // New endpoint to get all available nodes
+    @GetMapping("/getAllNodes")
+    public Map<Integer, String> getAllNodes() {
+        return nodeMap; // This will return the entire TreeMap
+    }
+
+
 
 
 }
