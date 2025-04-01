@@ -44,6 +44,22 @@ public class NodeController {
         return "Node added: " + node.getName() + " (hash: " + hash + ")";
     }
 
+
+    @PostMapping("/removeNode")
+    public String removeNode(@RequestBody Node node) {
+        int hash = hashNodeName(node.getName());
+
+        // Check if the node exists in the map
+        if (!nodeMap.containsKey(hash)) {
+            return "Node not found for removal: " + node.getName();
+        }
+
+        // Remove the node from the map
+        nodeMap.remove(hash);
+        return "Node removed: " + node.getName();
+    }
+
+
     // Sample endpoint to get the IP address of a file
 //    @GetMapping("/getFileLocation")
 //    public String getFileLocation(@RequestParam String filename) {
