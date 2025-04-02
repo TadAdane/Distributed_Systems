@@ -1,8 +1,11 @@
 package com.example.NamingServer.controller;
 
 import com.example.NamingServer.model.Node;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -33,6 +36,18 @@ public class NodeController {
         return (Math.abs(hash) % 32768); // Ensure the result is within the 0-32768 range
     }
 
+    // Saves the current nodeMap to a JSON file on disk
+    private void saveNodeMapToDisk() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            // Writes the map to a file named "nodeMap.json"
+            mapper.writeValue(new File("nodeMap.json"), nodeMap);
+        } catch (IOException e) {
+            // Print the error if saving fails
+            e.printStackTrace();
+        }
+    }
+
 
 
     // Add a node
@@ -43,6 +58,12 @@ public class NodeController {
         if (nodeMap.containsKey(hash)) {
             return "Node with name already exists (hash collision): " + hash;
         }
+
+        // Add the node to the map
+        nodeMap.put(hash, node.getIpAddress());
+
+        // Persist the updated map to disk
+        saveNodeMapToDisk();
 
         nodeMap.put(hash, node.getIpAddress());
         return "Node added: " + node.getName() + " (hash: " + hash + ")";
@@ -61,8 +82,12 @@ public class NodeController {
         localFiles.remove(hash);
         replicas.remove(hash);
 
+
         // Optional: remove files from fileToNodeMap that belonged to this node
         fileToNodeMap.values().removeIf(value -> value == hash);
+
+        // Persist the updated map to disk
+        saveNodeMapToDisk();
 
         return "Node removed: " + node.getName();
     }
