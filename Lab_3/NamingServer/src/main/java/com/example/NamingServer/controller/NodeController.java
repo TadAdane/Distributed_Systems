@@ -24,10 +24,15 @@ public class NodeController {
     private Map<Integer, List<String>> replicas = new HashMap<>();
 
     // Hashing function to map input to 0–32768
-    private int hashNodeName(String input) {
-        int hash = input.hashCode(); // can be negative
-        return (int) (((long) hash + MAX) * 32768 / ((long) MAX + Math.abs((long) MIN)));
+    private int hashNodeName(String nodeName) {
+        int hash = 0;
+        for (int i = 0; i < nodeName.length(); i++) {
+            hash = 31 * hash + nodeName.charAt(i); // A better approach for string hashing
+        }
+        return (Math.abs(hash) % 32768); // Ensure the result is within the 0-32768 range
     }
+
+
 
     // Add a node
     @PostMapping("/addNode")
