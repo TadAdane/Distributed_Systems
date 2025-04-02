@@ -11,6 +11,7 @@ public class NodeController {
     private static final int MAX = Integer.MAX_VALUE;
     private static final int MIN = -Integer.MAX_VALUE;
 
+
     // Node hash → IP
     private TreeMap<Integer, String> nodeMap = new TreeMap<>();
 
