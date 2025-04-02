@@ -68,15 +68,19 @@ public class NodeController {
 //        return "File location for " + filename + ": 192.168.1.1"; // Dummy IP
 //    }
     @GetMapping("/getFileLocation")
-    public String getFileLocation(@RequestParam String filename) {
+    public String getFileLocation(@RequestParam String filename){
         int fileHash = hashNodeName(filename);
 
         Integer selectedKey = nodeMap.floorKey(fileHash);
+        TreeMap<Integer, String> FileMap = new TreeMap<>();
+
 
         // Wrap around: als geen kleinere key gevonden wordt, neem de hoogste key
         if (selectedKey == null) {
             selectedKey = nodeMap.lastKey();
         }
+
+
 
         String ip = nodeMap.get(selectedKey);
 
@@ -88,8 +92,6 @@ public class NodeController {
     public Map<Integer, String> getAllNodes() {
         return nodeMap; // This will return the entire TreeMap
     }
-
-
 
 
 }
