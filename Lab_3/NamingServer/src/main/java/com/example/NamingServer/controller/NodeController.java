@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+//newest version, updated at 18:23, newest
 @RestController
 public class NodeController {
 
@@ -17,9 +18,12 @@ public class NodeController {
 
     // Node hash → IP
     private TreeMap<Integer, String> nodeMap = new TreeMap<>();
+    private final Map<Integer, NodeMeta> nodeMetadataMap = new HashMap<>();
 
     // filename → nodeHash (owner)
     private Map<String, Integer> fileToNodeMap = new HashMap<>();
+
+
 
     // nodeHash → list of owned files
     private Map<Integer, List<String>> localFiles = new HashMap<>();
@@ -49,6 +53,32 @@ public class NodeController {
     }
 
 
+    @PostMapping("/getPrevious")
+    public String getPrevious(@RequestBody Node node) {
+        int hash = hashNodeName(node.getName());
+        Integer prevHash = nodeMap.lowerKey(hash);
+
+        // If there is no lower number (begin of the ring), pick the last node
+        if (prevHash == null) {
+            prevHash = nodeMap.lastKey();
+        }
+
+        return nodeMap.get(prevHash);
+    }
+
+    @PostMapping("/getNext")
+    public String getNext(@RequestBody Node node) {
+        int hash = hashNodeName(node.getName());
+        Integer nextHash = nodeMap.higherKey(hash);
+
+        // If there is no higher number (end of the ring), pick the first node
+        if (nextHash == null) {
+            nextHash = nodeMap.firstKey();
+        }
+
+        return nodeMap.get(nextHash);
+    }
+
 
     // Add a node
     @PostMapping("/addNode")
@@ -62,12 +92,57 @@ public class NodeController {
         // Add the node to the map
         nodeMap.put(hash, node.getIpAddress());
 
+        // Update neighbors after adding the node
+        updateNodeNeighbors();
+
         // Persist the updated map to disk
         saveNodeMapToDisk();
 
-        nodeMap.put(hash, node.getIpAddress());
         return "Node added: " + node.getName() + " (hash: " + hash + ")";
+
     }
+
+
+    private void updateNodeNeighbors() {
+        List<Integer> keys = new ArrayList<>(nodeMap.keySet());
+
+        for (int i = 0; i < keys.size(); i++) {
+            int current = keys.get(i);
+            int prev = keys.get((i - 1 + keys.size()) % keys.size());
+            int next = keys.get((i + 1) % keys.size());
+
+            nodeMetadataMap.put(
+                    current,
+                    new NodeMeta(
+                            nodeMap.get(current),  // current IP
+                            prev,
+                            nodeMap.get(prev),
+                            next,
+                            nodeMap.get(next)
+                    )
+            );
+        }
+    }
+
+    public class NodeMeta {
+        private String ip;
+        private int prevHash;
+        private String prevIp;
+        private int nextHash;
+        private String nextIp;
+
+        public NodeMeta(String ip, int prevHash, String prevIp, int nextHash, String nextIp) {
+            this.ip = ip;
+            this.prevHash = prevHash;
+            this.prevIp = prevIp;
+            this.nextHash = nextHash;
+            this.nextIp = nextIp;
+        }
+
+        // Add getters/setters if needed (or use Lombok)
+    }
+
+
 
     // Remove a node
     @PostMapping("/removeNode")
