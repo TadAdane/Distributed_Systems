@@ -256,4 +256,20 @@ public class NodeController {
         return result;
     }
 
+
+//    This algorithm is activated in every exception thrown during communication with other nodes. This allows distributed detection of node failure
+//    Request the previous node and next node parameters from the nameserver
+//    Update the `next node` parameter of the previous node with the information received from the nameserver
+//    Update the `previous node` parameter of the next node with the information received from the nameserver
+//    Remove the node from the Naming server
+//    Test this algorithm manually terminating a node (CTRL – C) and use a ping method as part of each node, that throws an exception when connection fails to a given node
+
+    private void failure(nodeID ID){
+        Previous = getPrevious(ID);
+        Next = getNext(ID);
+        setNext(Previous, Next);
+        setPrevious(Next, Previous);
+        removeNode(ID);
+
+    }
 }
