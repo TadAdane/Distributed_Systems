@@ -272,4 +272,37 @@ public class NodeController {
         removeNode(ID);
 
     }
+
+    @PostMapping("/reportFailure")
+    public String reportFailure(@RequestBody Node failedNode) {
+        int failedHash = hashNodeName(failedNode.getName());
+
+        String prevIp = getPrevious(failedNode);
+        String nextIp = getNext(failedNode);
+
+        // Construct Node objects to update prev/next
+        Node prevNode = new Node(); prevNode.setName(getNodeNameFromIp(prevIp));
+        Node nextNode = new Node(); nextNode.setName(getNodeNameFromIp(nextIp));
+
+        // These endpoints exist on nodes (not the NamingServer)
+        sendHttpPost(prevIp + "/updateNext", nextNode);
+        sendHttpPost(nextIp + "/updatePrevious", prevNode);
+
+        // Remove the failed node from map
+        removeNode(failedNode);
+
+        return "Failure handled for node: " + failedNode.getName();
+    }
+
+    @PostMapping("/updateNext")
+    public void updateNext(@RequestBody Node newNext) {
+        this.nextNode = newNext;
+    }
+
+    @PostMapping("/updatePrevious")
+    public void updatePrevious(@RequestBody Node newPrev) {
+        this.previousNode = newPrev;
+    }
+
+
 }
