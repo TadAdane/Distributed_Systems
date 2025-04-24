@@ -1,4 +1,4 @@
-package com.example.NamingServer.model;
+package com.example.NamingServer.NamingServer.model;
 
 public class Node {
 
