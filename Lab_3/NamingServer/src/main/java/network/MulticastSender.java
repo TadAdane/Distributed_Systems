@@ -1,4 +1,4 @@
-package com.example.NamingServer.network;
+package network;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
