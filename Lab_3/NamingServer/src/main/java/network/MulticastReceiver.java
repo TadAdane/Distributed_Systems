@@ -63,7 +63,7 @@ public class MulticastReceiver {
             String response = "Current node count: " + (nodeMap.size() - 1);
 
             // Bepaal naar welk IP en poort je het antwoord moet terugsturen
-            InetAddress targetAddress = packet.getAddress(); // IP van de zender
+            InetAddress targetAddress = packet.getAddress(); // IP of the sender = new client
             int targetPort = packet.getPort(); // poort van de zender
 
             // Maak een antwoordpakket en stuur dat terug naar de afzender
