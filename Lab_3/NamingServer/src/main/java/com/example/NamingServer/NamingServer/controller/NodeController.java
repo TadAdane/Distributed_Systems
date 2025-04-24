@@ -1,6 +1,6 @@
 package com.example.NamingServer.NamingServer.controller;
 
-import com.example.NamingServer.NamingServer.model.Node;
+import NodePackage.Node;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ public class NodeController {
     private static final int MIN = -Integer.MAX_VALUE;
 
 
-    // Node hash → IP
+    // NodePackage.Node hash → IP
     private TreeMap<Integer, String> nodeMap = new TreeMap<>();
 
     // filename → nodeHash (owner)
@@ -56,7 +56,7 @@ public class NodeController {
         int hash = hashNodeName(node.getName());
 
         if (nodeMap.containsKey(hash)) {
-            return "Node with name already exists (hash collision): " + hash;
+            return "NodePackage.Node with name already exists (hash collision): " + hash;
         }
 
         // Add the node to the map
@@ -66,7 +66,7 @@ public class NodeController {
         saveNodeMapToDisk();
 
         nodeMap.put(hash, node.getIpAddress());
-        return "Node added: " + node.getName() + " (hash: " + hash + ")";
+        return "NodePackage.Node added: " + node.getName() + " (hash: " + hash + ")";
     }
 
     // Remove a node
@@ -75,7 +75,7 @@ public class NodeController {
         int hash = hashNodeName(node.getName());
 
         if (!nodeMap.containsKey(hash)) {
-            return "Node not found for removal: " + node.getName();
+            return "NodePackage.Node not found for removal: " + node.getName();
         }
 
         nodeMap.remove(hash);
@@ -89,7 +89,7 @@ public class NodeController {
         // Persist the updated map to disk
         saveNodeMapToDisk();
 
-        return "Node removed: " + node.getName();
+        return "NodePackage.Node removed: " + node.getName();
     }
 
     // Register a file to a node (owner) + replica to node based on file hash
@@ -98,7 +98,7 @@ public class NodeController {
         int nodeHash = hashNodeName(nodeName);
 
         if (!nodeMap.containsKey(nodeHash)) {
-            return "Node not registered: " + nodeName;
+            return "NodePackage.Node not registered: " + nodeName;
         }
 
         fileToNodeMap.put(filename, nodeHash);
@@ -125,10 +125,10 @@ public class NodeController {
 
         String ip = nodeMap.get(nodeHash);
         if (ip == null) {
-            return "Node with hash " + nodeHash + " not found.";
+            return "NodePackage.Node with hash " + nodeHash + " not found.";
         }
 
-        return "File location for '" + filename + "' → Node hash: " + nodeHash + " → IP: " + ip;
+        return "File location for '" + filename + "' → NodePackage.Node hash: " + nodeHash + " → IP: " + ip;
     }
 
     // Optional: file fallback using hash-based logic (like in slide spec)
