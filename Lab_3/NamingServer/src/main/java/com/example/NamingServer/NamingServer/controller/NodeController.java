@@ -1,6 +1,6 @@
 package com.example.NamingServer.NamingServer.controller;
 
-import com.example.NamingServer.NamingServer.model.Node;
+import NodePackage.Node;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +17,13 @@ public class NodeController {
     private static final int MIN = -Integer.MAX_VALUE;
 
 
-    // Node hash → IP
+    // NodePackage.Node hash → IP
     private TreeMap<Integer, String> nodeMap = new TreeMap<>();
+
+    // IP → Node name (to be able to reconstruct full Node objects if needed)
+    private Map<String, String> ipToName = new HashMap<>();
+
+    // Hash → full metadata including prev/next info
     private final Map<Integer, NodeMeta> nodeMetadataMap = new HashMap<>();
 
     // filename → nodeHash (owner)
@@ -54,30 +59,75 @@ public class NodeController {
     }
 
 
+//    @PostMapping("/getPrevious")
+//    public String getPrevious(@RequestBody Node node) {
+//        int hash = hashNodeName(node.getName());
+//        Integer prevHash = nodeMap.lowerKey(hash);
+//
+//        // If there is no lower number (begin of the ring), pick the last node
+//        if (prevHash == null) {
+//            prevHash = nodeMap.lastKey();
+//        }
+//
+//        return nodeMap.get(prevHash);
+//    }
+
     @PostMapping("/getPrevious")
-    public String getPrevious(@RequestBody Node node) {
+    public Node getPrevious(@RequestBody Node node) {
         int hash = hashNodeName(node.getName());
         Integer prevHash = nodeMap.lowerKey(hash);
 
-        // If there is no lower number (begin of the ring), pick the last node
+        // If there's no lower key, it means we're at the beginning — loop to the last
         if (prevHash == null) {
             prevHash = nodeMap.lastKey();
         }
 
-        return nodeMap.get(prevHash);
+        String prevIp = nodeMap.get(prevHash);
+        String name  = getNodeNameFromIp(prevIp);
+
+        Node prevNode = new Node(prevIp, name);
+
+        return prevNode;
     }
 
+
+//    @PostMapping("/getNext")
+//    public String getNext(@RequestBody Node node) {
+//        int hash = hashNodeName(node.getName());
+//        Integer nextHash = nodeMap.higherKey(hash);
+//
+//        // If there is no higher number (end of the ring), pick the first node
+//        if (nextHash == null) {
+//            nextHash = nodeMap.firstKey();
+//        }
+//
+//        return nodeMap.get(nextHash);
+//    }
+
     @PostMapping("/getNext")
-    public String getNext(@RequestBody Node node) {
+    public Node getNext(@RequestBody Node node) {
         int hash = hashNodeName(node.getName());
         Integer nextHash = nodeMap.higherKey(hash);
 
-        // If there is no higher number (end of the ring), pick the first node
+        // If there's no higher key, we're at the end — loop to the first
         if (nextHash == null) {
             nextHash = nodeMap.firstKey();
         }
 
-        return nodeMap.get(nextHash);
+        String nextIp = nodeMap.get(nextHash);
+        String name = getNodeNameFromIp(nextIp);
+
+        Node nextNode = new Node(nextIp, name);
+
+        return nextNode;
+    }
+
+    private String getNodeNameFromIp(String ip) {
+        if (ipToName.containsKey(ip)) {
+            return ipToName.get(ip);
+        } else {
+            return "unknown";
+        }
     }
 
 
@@ -87,7 +137,7 @@ public class NodeController {
         int hash = hashNodeName(node.getName());
 
         if (nodeMap.containsKey(hash)) {
-            return "Node with name already exists (hash collision): " + hash;
+            return "NodePackage.Node with name already exists (hash collision): " + hash;
         }
 
         // Add the node to the map
@@ -99,8 +149,7 @@ public class NodeController {
         // Persist the updated map to disk
         saveNodeMapToDisk();
 
-        return "Node added: " + node.getName() + " (hash: " + hash + ")";
-
+        return "NodePackage.Node added: " + node.getName() + " (hash: " + hash + ")";
     }
 
 
@@ -140,7 +189,6 @@ public class NodeController {
             this.nextIp = nextIp;
         }
 
-        // Add getters/setters if needed (or use Lombok)
     }
 
 
@@ -151,7 +199,7 @@ public class NodeController {
         int hash = hashNodeName(node.getName());
 
         if (!nodeMap.containsKey(hash)) {
-            return "Node not found for removal: " + node.getName();
+            return "NodePackage.Node not found for removal: " + node.getName();
         }
 
         nodeMap.remove(hash);
@@ -165,7 +213,7 @@ public class NodeController {
         // Persist the updated map to disk
         saveNodeMapToDisk();
 
-        return "Node removed: " + node.getName();
+        return "NodePackage.Node removed: " + node.getName();
     }
 
     // Register a file to a node (owner) + replica to node based on file hash
@@ -174,7 +222,7 @@ public class NodeController {
         int nodeHash = hashNodeName(nodeName);
 
         if (!nodeMap.containsKey(nodeHash)) {
-            return "Node not registered: " + nodeName;
+            return "NodePackage.Node not registered: " + nodeName;
         }
 
         fileToNodeMap.put(filename, nodeHash);
@@ -201,10 +249,10 @@ public class NodeController {
 
         String ip = nodeMap.get(nodeHash);
         if (ip == null) {
-            return "Node with hash " + nodeHash + " not found.";
+            return "NodePackage.Node with hash " + nodeHash + " not found.";
         }
 
-        return "File location for '" + filename + "' → Node hash: " + nodeHash + " → IP: " + ip;
+        return "File location for '" + filename + "' → NodePackage.Node hash: " + nodeHash + " → IP: " + ip;
     }
 
     // Optional: file fallback using hash-based logic (like in slide spec)
@@ -265,29 +313,17 @@ public class NodeController {
 //    Remove the node from the Naming server
 //    Test this algorithm manually terminating a node (CTRL – C) and use a ping method as part of each node, that throws an exception when connection fails to a given node
 
-    private void failure(nodeID ID){
-        Previous = getPrevious(ID);
-        Next = getNext(ID);
-        setNext(Previous, Next);
-        setPrevious(Next, Previous);
-        removeNode(ID);
-
-    }
 
     @PostMapping("/reportFailure")
     public String reportFailure(@RequestBody Node failedNode) {
-        int failedHash = hashNodeName(failedNode.getName());
+//        int failedHash = hashNodeName(failedNode.getName());
 
-        String prevIp = getPrevious(failedNode);
-        String nextIp = getNext(failedNode);
+        Node prevNode = getPrevious(failedNode);
+        Node nextNode = getNext(failedNode);
 
-        // Construct Node objects to update prev/next
-        Node prevNode = new Node(); prevNode.setName(getNodeNameFromIp(prevIp));
-        Node nextNode = new Node(); nextNode.setName(getNodeNameFromIp(nextIp));
-
-        // These endpoints exist on nodes (not the NamingServer)
-        sendHttpPost(prevIp + "/updateNext", nextNode);
-        sendHttpPost(nextIp + "/updatePrevious", prevNode);
+        // Send updates to the neighboring nodes
+        sendHttpPost(prevNode.getIpAddress() + "/updateNext", nextNode);
+        sendHttpPost(nextNode.getIpAddress() + "/updatePrevious", prevNode);
 
         // Remove the failed node from map
         removeNode(failedNode);
