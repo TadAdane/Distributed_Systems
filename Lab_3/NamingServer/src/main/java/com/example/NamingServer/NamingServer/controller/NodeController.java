@@ -1,6 +1,7 @@
 package com.example.NamingServer.NamingServer.controller;
 
 import NodePackage.Node;
+import Functions.HashingFunction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,14 +28,15 @@ public class NodeController {
     // nodeHash → list of replicated files
     private Map<Integer, List<String>> replicas = new HashMap<>();
 
-    // Hashing function to map input to 0–32768
-    private int hashNodeName(String nodeName) {
-        int hash = 0;
-        for (int i = 0; i < nodeName.length(); i++) {
-            hash = 31 * hash + nodeName.charAt(i); // A better approach for string hashing
-        }
-        return (Math.abs(hash) % 32768); // Ensure the result is within the 0-32768 range
-    }
+
+//    // Hashing function to map input to 0–32768
+//    private int hashNodeName(String nodeName) {
+//        int hash = 0;
+//        for (int i = 0; i < nodeName.length(); i++) {
+//            hash = 31 * hash + nodeName.charAt(i); // A better approach for string hashing
+//        }
+//        return (Math.abs(hash) % 32768); // Ensure the result is within the 0-32768 range
+//    }
 
     // Saves the current nodeMap to a JSON file on disk
     private void saveNodeMapToDisk() {
@@ -53,7 +55,7 @@ public class NodeController {
     // Add a node
     @PostMapping("/addNode")
     public String addNode(@RequestBody Node node) {
-        int hash = hashNodeName(node.getName());
+        int hash = HashingFunction.hashNodeName(node.getName());
 
         if (nodeMap.containsKey(hash)) {
             return "NodePackage.Node with name already exists (hash collision): " + hash;
@@ -72,7 +74,7 @@ public class NodeController {
     // Remove a node
     @PostMapping("/removeNode")
     public String removeNode(@RequestBody Node node) {
-        int hash = hashNodeName(node.getName());
+        int hash = HashingFunction.hashNodeName(node.getName());
 
         if (!nodeMap.containsKey(hash)) {
             return "NodePackage.Node not found for removal: " + node.getName();
@@ -95,7 +97,7 @@ public class NodeController {
     // Register a file to a node (owner) + replica to node based on file hash
     @PostMapping("/registerFile")
     public String registerFile(@RequestParam String filename, @RequestParam String nodeName) {
-        int nodeHash = hashNodeName(nodeName);
+        int nodeHash = HashingFunction.hashNodeName(nodeName);
 
         if (!nodeMap.containsKey(nodeHash)) {
             return "NodePackage.Node not registered: " + nodeName;
@@ -104,7 +106,7 @@ public class NodeController {
         fileToNodeMap.put(filename, nodeHash);
         localFiles.computeIfAbsent(nodeHash, k -> new ArrayList<>()).add(filename);
 
-        int fileHash = hashNodeName(filename);
+        int fileHash = HashingFunction.hashNodeName(filename);
         Integer replicaNode = nodeMap.floorKey(fileHash);
         if (replicaNode == null) replicaNode = nodeMap.lastKey();
 
@@ -134,7 +136,7 @@ public class NodeController {
     // Optional: file fallback using hash-based logic (like in slide spec)
     @GetMapping("/getFileLocationHashed")
     public String getFileLocationHashed(@RequestParam String filename) {
-        int fileHash = hashNodeName(filename);
+        int fileHash = HashingFunction.hashNodeName(filename);
         Integer nodeHash = nodeMap.floorKey(fileHash);
         if (nodeHash == null) nodeHash = nodeMap.lastKey();
 
@@ -151,14 +153,14 @@ public class NodeController {
     // Return files locally owned by a node
     @GetMapping("/getLocalFiles")
     public List<String> getLocalFiles(@RequestParam String nodeName) {
-        int hash = hashNodeName(nodeName);
+        int hash = HashingFunction.hashNodeName(nodeName);
         return localFiles.getOrDefault(hash, Collections.emptyList());
     }
 
     // Return replicated files of a node
     @GetMapping("/getReplicas")
     public List<String> getReplicas(@RequestParam String nodeName) {
-        int hash = hashNodeName(nodeName);
+        int hash = HashingFunction.hashNodeName(nodeName);
         return replicas.getOrDefault(hash, Collections.emptyList());
     }
 
