@@ -1,8 +1,11 @@
 package com.example.NamingServer.controller;
 
 import com.example.NamingServer.model.Node;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -33,6 +36,18 @@ public class NodeController {
         return (Math.abs(hash) % 32768); // Ensure the result is within the 0-32768 range
     }
 
+    // Saves the current nodeMap to a JSON file on disk
+    private void saveNodeMapToDisk() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            // Writes the map to a file named "nodeMap.json"
+            mapper.writeValue(new File("nodeMap.json"), nodeMap);
+        } catch (IOException e) {
+            // Print the error if saving fails
+            e.printStackTrace();
+        }
+    }
+
 
 
     // Add a node
@@ -43,6 +58,12 @@ public class NodeController {
         if (nodeMap.containsKey(hash)) {
             return "Node with name already exists (hash collision): " + hash;
         }
+
+        // Add the node to the map
+        nodeMap.put(hash, node.getIpAddress());
+
+        // Persist the updated map to disk
+        saveNodeMapToDisk();
 
         nodeMap.put(hash, node.getIpAddress());
         return "Node added: " + node.getName() + " (hash: " + hash + ")";
@@ -61,8 +82,12 @@ public class NodeController {
         localFiles.remove(hash);
         replicas.remove(hash);
 
+
         // Optional: remove files from fileToNodeMap that belonged to this node
         fileToNodeMap.values().removeIf(value -> value == hash);
+
+        // Persist the updated map to disk
+        saveNodeMapToDisk();
 
         return "Node removed: " + node.getName();
     }
@@ -72,37 +97,12 @@ public class NodeController {
     public String registerFile(@RequestParam String filename, @RequestParam String nodeName) {
         int nodeHash = hashNodeName(nodeName);
 
-<<<<<<< HEAD
-    // Sample endpoint to get the IP address of a file
-//    @GetMapping("/getFileLocation")
-//    public String getFileLocation(@RequestParam String filename) {
-//        // Here, you will implement the file lookup logic
-//        return "File location for " + filename + ": 192.168.1.1"; // Dummy IP
-//    }
-    @GetMapping("/getFileLocation")
-    public String getFileLocation(@RequestParam String filename){
-        int fileHash = hashNodeName(filename);
-
-        Integer selectedKey = nodeMap.floorKey(fileHash);
-        TreeMap<Integer, String> FileMap = new TreeMap<>();
-
-
-        // Wrap around: als geen kleinere key gevonden wordt, neem de hoogste key
-        if (selectedKey == null) {
-            selectedKey = nodeMap.lastKey();
-        }
-
-
-
-        String ip = nodeMap.get(selectedKey);
-=======
         if (!nodeMap.containsKey(nodeHash)) {
             return "Node not registered: " + nodeName;
         }
 
         fileToNodeMap.put(filename, nodeHash);
         localFiles.computeIfAbsent(nodeHash, k -> new ArrayList<>()).add(filename);
->>>>>>> eea8e8c996611b682809ba29a6ecfe4dda29cbd2
 
         int fileHash = hashNodeName(filename);
         Integer replicaNode = nodeMap.floorKey(fileHash);
@@ -155,9 +155,6 @@ public class NodeController {
         return localFiles.getOrDefault(hash, Collections.emptyList());
     }
 
-<<<<<<< HEAD
-}
-=======
     // Return replicated files of a node
     @GetMapping("/getReplicas")
     public List<String> getReplicas(@RequestParam String nodeName) {
@@ -185,4 +182,3 @@ public class NodeController {
     }
 
 }
->>>>>>> eea8e8c996611b682809ba29a6ecfe4dda29cbd2

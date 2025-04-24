@@ -5,6 +5,9 @@ public class Node {
     private String name; // Node name (used for hashing)
     private String ipAddress; // IP address of the node
 
+    int previousNodeID;
+    int nextNodeID;
+
     // Constructors, getters, setters
     public Node() {}
 
