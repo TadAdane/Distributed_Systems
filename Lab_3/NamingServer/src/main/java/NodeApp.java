@@ -4,6 +4,7 @@ import network.MulticastSender;
 public class NodeApp {
 
     // Maakt een Node object aan met naam en IP-adres
+    //trace
     public Node createExternalNode(String name, String ipAddress) {
         return new Node(ipAddress, name);
     }
