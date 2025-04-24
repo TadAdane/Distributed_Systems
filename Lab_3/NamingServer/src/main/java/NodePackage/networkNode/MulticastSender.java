@@ -1,4 +1,4 @@
-package network;
+package NodePackage.networkNode;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

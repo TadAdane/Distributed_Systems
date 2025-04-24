@@ -315,32 +315,32 @@ public class NodeController {
 //    Test this algorithm manually terminating a node (CTRL – C) and use a ping method as part of each node, that throws an exception when connection fails to a given node
 
 
-    @PostMapping("/reportFailure")
-    public String reportFailure(@RequestBody Node failedNode) {
-//        int failedHash = hashNodeName(failedNode.getName());
-
-        Node prevNode = getPrevious(failedNode);
-        Node nextNode = getNext(failedNode);
-
-        // Send updates to the neighboring nodes
-        sendHttpPost(prevNode.getIpAddress() + "/updateNext", nextNode);
-        sendHttpPost(nextNode.getIpAddress() + "/updatePrevious", prevNode);
-
-        // Remove the failed node from map
-        removeNode(failedNode);
-
-        return "Failure handled for node: " + failedNode.getName();
-    }
-
-    @PostMapping("/updateNext")
-    public void updateNext(@RequestBody Node newNext) {
-        this.nextNode = newNext;
-    }
-
-    @PostMapping("/updatePrevious")
-    public void updatePrevious(@RequestBody Node newPrev) {
-        this.previousNode = newPrev;
-    }
-
+//    @PostMapping("/reportFailure")
+//    public String reportFailure(@RequestBody Node failedNode) {
+////        int failedHash = hashNodeName(failedNode.getName());
+//
+//        Node prevNode = getPrevious(failedNode);
+//        Node nextNode = getNext(failedNode);
+//
+//        // Send updates to the neighboring nodes
+//        sendHttpPost(prevNode.getIpAddress() + "/updateNext", nextNode);
+//        sendHttpPost(nextNode.getIpAddress() + "/updatePrevious", prevNode);
+//
+//        // Remove the failed node from map
+//        removeNode(failedNode);
+//
+//        return "Failure handled for node: " + failedNode.getName();
+//    }
+//
+//    @PostMapping("/updateNext")
+//    public void updateNext(@RequestBody Node newNext) {
+//        this.nextNode = newNext;
+//    }
+//
+//    @PostMapping("/updatePrevious")
+//    public void updatePrevious(@RequestBody Node newPrev) {
+//        this.previousNode = newPrev;
+//    }
+//
 
 }

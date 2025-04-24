@@ -5,9 +5,9 @@ public class Node {
     private String name;
     private String ipAddress;
 
-    private int previousID = -1;  // wordt ingesteld na bootstrap
-    private int nextID = -1;      // wordt ingesteld na bootstrap
-    private int totalNodes = 0; // Veld om het totaal aantal nodes in het netwerk bij te houden
+    private int previousID = -1;
+    private int nextID = -1;
+    private int totalNodes = 0;
 
     public Node(String name, String ipAddress) {
         this.name = name;
@@ -46,9 +46,4 @@ public class Node {
         this.totalNodes = totalNodes;
     }
 
-    // Optional: toon info
-    public void printStatus() {
-        System.out.println("NodePackage.Node: " + name + " @ " + ipAddress);
-        System.out.println("Prev: " + previousID + ", Next: " + nextID);
-    }
 }
