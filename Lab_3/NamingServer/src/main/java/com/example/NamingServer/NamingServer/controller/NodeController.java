@@ -1,6 +1,6 @@
-package com.example.NamingServer.controller;
+package com.example.NamingServer.NamingServer.controller;
 
-import com.example.NamingServer.model.Node;
+import com.example.NamingServer.NamingServer.model.Node;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
