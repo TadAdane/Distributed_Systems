@@ -75,7 +75,7 @@ public class NodeController {
 
     @PostMapping("/getPrevious")
     public Node getPrevious(@RequestBody Node node) {
-        int hash = hashNodeName(node.getName());
+        int hash = HashingFunction.hashNodeName(node.getName());
         Integer prevHash = nodeMap.lowerKey(hash);
 
         // If there's no lower key, it means we're at the beginning — loop to the last
@@ -107,7 +107,7 @@ public class NodeController {
 
     @PostMapping("/getNext")
     public Node getNext(@RequestBody Node node) {
-        int hash = hashNodeName(node.getName());
+        int hash = HashingFunction.hashNodeName(node.getName());
         Integer nextHash = nodeMap.higherKey(hash);
 
         // If there's no higher key, we're at the end — loop to the first
