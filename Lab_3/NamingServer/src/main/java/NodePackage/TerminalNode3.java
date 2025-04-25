@@ -1,8 +1,8 @@
 package NodePackage;
 
-public class TestNode {
+public class TerminalNode3 {
     public static void main(String[] args) {
         NodeApp app = new NodeApp();
-        app.createAndAnnounceNewNode("nodeX", "192.168.0.77", 5000, 10000,4448);
+        app.createAndAnnounceNewNode("setare", "192.168.0.70", 500, 1000,4450);
     }
 }

@@ -46,4 +46,14 @@ public class Node {
         this.totalNodes = totalNodes;
     }
 
+
+    public void printStatus() {
+        System.out.println("🟢 Node status:");
+        System.out.println("   → Name: " + name);
+        System.out.println("   → IP: " + ipAddress);
+        System.out.println("   → Previous ID: " + previousID);
+        System.out.println("   → Next ID: " + nextID);
+    }
+
+
 }

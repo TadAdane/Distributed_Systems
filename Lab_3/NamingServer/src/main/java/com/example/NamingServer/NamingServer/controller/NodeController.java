@@ -306,9 +306,8 @@ public class NodeController {
         return result;
     }
 
-<<<<<<< HEAD
-}
-=======
+
+
 
 //    This algorithm is activated in every exception thrown during communication with other nodes. This allows distributed detection of node failure
 //    Request the previous node and next node parameters from the nameserver
@@ -347,4 +346,4 @@ public class NodeController {
 //
 
 }
->>>>>>> 6c9031c8d48b616040fe571fe5dae546a2810fb6
+

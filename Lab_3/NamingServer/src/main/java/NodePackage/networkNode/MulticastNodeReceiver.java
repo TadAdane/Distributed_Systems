@@ -4,6 +4,7 @@ import Functions.HashingFunction;
 import NodePackage.Node;
 
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
@@ -48,12 +49,60 @@ public class MulticastNodeReceiver {
             if (currentID < newNodeID && newNodeID < nextID) {
                 localNode.setNextID(newNodeID);
                 System.out.println("🔁 Updated nextID → " + newNodeID);
+
+                // Stuur unicast terug naar de nieuwe node
+                String response = "currentID=" + currentID +
+                        ", prevID=" + prevID +
+                        ", nextID=" + nextID;
+
+                InetAddress targetAddress = InetAddress.getByName(newNodeIP);
+                int targetPort = 4447; // vaste poort waarop nieuwe node luistert
+
+                DatagramPacket reply = new DatagramPacket(
+                        response.getBytes(),
+                        response.length(),
+                        targetAddress,
+                        targetPort
+                );
+
+                DatagramSocket unicastSocket = new DatagramSocket();
+                unicastSocket.send(reply);
+                unicastSocket.close();
+
+                System.out.println("📤 Sent unicast response to " + newNodeIP + ":4447 → " + response);
+
+
+
             }
+
 
             // Node komt tussen previous en current
             else if (prevID < newNodeID && newNodeID < currentID) {
                 localNode.setPreviousID(newNodeID);
                 System.out.println("🔁 Updated previousID → " + newNodeID);
+
+                // Stuur unicast terug naar de nieuwe node
+                String response = "currentID=" + currentID +
+                        ", prevID=" + prevID +
+                        ", nextID=" + nextID;
+
+                InetAddress targetAddress = InetAddress.getByName(newNodeIP);
+                int targetPort = 4447; // vaste poort waarop nieuwe node luistert
+
+                DatagramPacket reply = new DatagramPacket(
+                        response.getBytes(),
+                        response.length(),
+                        targetAddress,
+                        targetPort
+                );
+
+                DatagramSocket unicastSocket = new DatagramSocket();
+
+                unicastSocket.send(reply);
+                unicastSocket.close();
+
+                System.out.println("📤 Sent unicast response to " + newNodeIP + ":4447 → " + response);
+
             }
         }
     }

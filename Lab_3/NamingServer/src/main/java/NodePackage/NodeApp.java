@@ -2,16 +2,21 @@ package NodePackage;
 
 import NodePackage.networkNode.MulticastNodeReceiver;
 import NodePackage.networkNode.MulticastSender;
+import NodePackage.networkNode.NodeUnicastReceiver;
 
 public class NodeApp {
 
-    public Node createAndAnnounceNewNode(String name, String ipAddress, int prev, int next) {
+    public Node createAndAnnounceNewNode(String name, String ipAddress, int prev, int next, int unicastPort)
+    {
         Node node = new Node(name, ipAddress);
         node.setPreviousID(prev);
         node.setNextID(next);
 
         try {
             MulticastSender.sendMulticast(name, ipAddress);
+            new NodeUnicastReceiver(node, unicastPort).start(); // geef unieke poort mee per node
+
+
         } catch (Exception e) {
             System.err.println("Fout bij multicast:");
             e.printStackTrace();
