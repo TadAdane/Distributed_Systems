@@ -214,6 +214,30 @@ public class NodeController {
 
     }
 
+    // Helper method to find a node by its ID
+// Find Node by ID using hash and nodeMap (matching the removeNode approach)
+// Find Node by Node object (using node name hash and nodeMap)
+    private Node findNodeById(Node node) {
+        System.out.println("Searching for Node with name: " + node.getName());
+
+        // Calculate the hash for the node's name (instead of node ID as a string)
+        int hash = HashingFunction.hashNodeName(node.getName());
+        System.out.println("Hash for node: " + node.getName() + " is: " + hash);  // Log the hash
+
+        // Retrieve the node's IP from nodeMap using the hash
+        String nodeIp = nodeMap.get(hash);
+
+        if (nodeIp != null) {
+            // If the node is found, return a new Node instance
+            System.out.println("Node found: " + node.getName());
+            return new Node(node.getName(), nodeIp);  // Create and return the Node using name and IP
+        }
+
+        System.out.println("Node with name " + node.getName() + " not found.");
+        return null;  // Return null if no node is found
+    }
+
+
 
 
     // Remove a node
@@ -337,6 +361,19 @@ public class NodeController {
 //    Test this algorithm manually terminating a node (CTRL – C) and use a ping method as part of each node, that throws an exception when connection fails to a given node
 
 
+    // Remove the node from nodeMap (this will be in NodeController.java)
+    public void removeNodeFromMap(Node node) {
+        // Calculate the hash for the node's name (same as in findNodeById)
+        int hash = HashingFunction.hashNodeName(node.getName());
+
+        // Remove node by its hash from nodeMap
+        nodeMap.remove(hash);  // This will remove the node from the nodeMap
+
+        System.out.println("Node " + node.getName() + " removed from nodeMap.");
+    }
+
+
+
     @PostMapping("/reportFailure")
     public String reportFailure(@RequestBody Node failedNode) {
 //        int failedHash = hashNodeName(failedNode.getName());
@@ -362,6 +399,24 @@ public class NodeController {
     @PostMapping("/updatePrevious")
     public void updatePrevious(@RequestBody Node newPrev) {
         this.previousNode = newPrev;
+    }
+
+    @PostMapping("/shutdown")
+    public String shutdownNode(@RequestBody Node node) {
+        // Use the updated findNodeById() to find the node
+        Node nodeToShutdown = findNodeById(node);
+
+        if (nodeToShutdown == null) {
+            return "Node not found!";  // If the node is not found, return an error message
+        }
+
+        // Remove the node from nodeMap using the method from NodeController.java
+        removeNodeFromMap(nodeToShutdown);  // This removes the node from the map
+
+        // Trigger shutdown in Node.java (cleanup and other operations)
+        nodeToShutdown.shutdown();
+
+        return "Node " + node.getName() + " has been successfully shut down!";
     }
 
 

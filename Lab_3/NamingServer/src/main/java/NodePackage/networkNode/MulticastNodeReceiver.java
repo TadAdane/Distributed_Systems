@@ -31,7 +31,7 @@ public class MulticastNodeReceiver {
             socket.receive(packet);
 
             String received = new String(packet.getData(), 0, packet.getLength());
-            System.out.println("Received multicast: " + received);
+            System.out.println("📥 Received multicast: " + received);
 
             String[] parts = received.split(",");
             if (parts.length != 2) continue;
@@ -47,13 +47,13 @@ public class MulticastNodeReceiver {
             // Node komt tussen current en next
             if (currentID < newNodeID && newNodeID < nextID) {
                 localNode.setNextID(newNodeID);
-                System.out.println("Updated nextID → " + newNodeID);
+                System.out.println("🔁 Updated nextID → " + newNodeID);
             }
 
             // Node komt tussen previous en current
             else if (prevID < newNodeID && newNodeID < currentID) {
                 localNode.setPreviousID(newNodeID);
-                System.out.println("Updated previousID → " + newNodeID);
+                System.out.println("🔁 Updated previousID → " + newNodeID);
             }
         }
     }
