@@ -5,6 +5,6 @@ public class TerminalNode {
         NodeApp app = new NodeApp();
 
         // Pas hier zelf aan:
-        app.createAndAnnounceNewNode("nodeZ", "192.168.0.78", 501, 10,4449);
+        app.createAndAnnounceNewNode("nodeZ", "192.168.0.78",4449);
     }
 }
