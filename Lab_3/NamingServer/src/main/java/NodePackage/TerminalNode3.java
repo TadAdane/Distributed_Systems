@@ -6,3 +6,4 @@ public class TerminalNode3 {
         app.createAndAnnounceNewNode("setare", "192.168.0.70", 500, 1000,4450);
     }
 }
+//jjnjnnn
