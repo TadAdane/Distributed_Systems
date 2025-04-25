@@ -1,13 +1,15 @@
+package NodePackage;
 
-public class NodeClient {
+public class Node {
 
     private String name;
     private String ipAddress;
 
-    private int previousID = -1;  // wordt ingesteld na bootstrap
-    private int nextID = -1;      // wordt ingesteld na bootstrap
+    private int previousID = -1;
+    private int nextID = -1;
+    private int totalNodes = 0;
 
-    public NodeClient(String name, String ipAddress) {
+    public Node(String name, String ipAddress) {
         this.name = name;
         this.ipAddress = ipAddress;
     }
@@ -36,9 +38,12 @@ public class NodeClient {
         this.nextID = nextID;
     }
 
-    // Optional: toon info
-    public void printStatus() {
-        System.out.println("Node: " + name + " @ " + ipAddress);
-        System.out.println("Prev: " + previousID + ", Next: " + nextID);
+    public int getTotalNodes() {
+        return totalNodes;
     }
+
+    public void setTotalNodes(int totalNodes) {
+        this.totalNodes = totalNodes;
+    }
+
 }
