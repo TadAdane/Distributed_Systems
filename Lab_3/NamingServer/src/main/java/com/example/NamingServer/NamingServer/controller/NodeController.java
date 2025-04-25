@@ -5,6 +5,10 @@ import Functions.HashingFunction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
+
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -15,6 +19,10 @@ public class NodeController {
 
     private static final int MAX = Integer.MAX_VALUE;
     private static final int MIN = -Integer.MAX_VALUE;
+
+    private Node nextNode;
+    private Node previousNode;
+
 
 
     // NodePackage.Node hash → IP
@@ -36,6 +44,20 @@ public class NodeController {
 
     // nodeHash → list of replicated files
     private Map<Integer, List<String>> replicas = new HashMap<>();
+
+
+
+    @Autowired
+    private RestTemplate restTemplate; // hier voeg je hem toe
+
+    private void sendHttpPost(String url, Object body) { // hier voeg je hem toe
+        try {
+            restTemplate.postForObject(url, body, Void.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // extra logging aanbevolen
+        }
+    }
 
 
 //    // Hashing function to map input to 0–32768
@@ -315,32 +337,32 @@ public class NodeController {
 //    Test this algorithm manually terminating a node (CTRL – C) and use a ping method as part of each node, that throws an exception when connection fails to a given node
 
 
-//    @PostMapping("/reportFailure")
-//    public String reportFailure(@RequestBody Node failedNode) {
-////        int failedHash = hashNodeName(failedNode.getName());
-//
-//        Node prevNode = getPrevious(failedNode);
-//        Node nextNode = getNext(failedNode);
-//
-//        // Send updates to the neighboring nodes
-//        sendHttpPost(prevNode.getIpAddress() + "/updateNext", nextNode);
-//        sendHttpPost(nextNode.getIpAddress() + "/updatePrevious", prevNode);
-//
-//        // Remove the failed node from map
-//        removeNode(failedNode);
-//
-//        return "Failure handled for node: " + failedNode.getName();
-//    }
-//
-//    @PostMapping("/updateNext")
-//    public void updateNext(@RequestBody Node newNext) {
-//        this.nextNode = newNext;
-//    }
-//
-//    @PostMapping("/updatePrevious")
-//    public void updatePrevious(@RequestBody Node newPrev) {
-//        this.previousNode = newPrev;
-//    }
-//
+    @PostMapping("/reportFailure")
+    public String reportFailure(@RequestBody Node failedNode) {
+//        int failedHash = hashNodeName(failedNode.getName());
+
+        Node prevNode = getPrevious(failedNode);
+        Node nextNode = getNext(failedNode);
+
+        // Send updates to the neighboring nodes
+        sendHttpPost(prevNode.getIpAddress() + "/updateNext", nextNode);
+        sendHttpPost(nextNode.getIpAddress() + "/updatePrevious", prevNode);
+
+        // Remove the failed node from map
+        removeNode(failedNode);
+
+        return "Failure handled for node: " + failedNode.getName();
+    }
+
+    @PostMapping("/updateNext")
+    public void updateNext(@RequestBody Node newNext) {
+        this.nextNode = newNext;
+    }
+
+    @PostMapping("/updatePrevious")
+    public void updatePrevious(@RequestBody Node newPrev) {
+        this.previousNode = newPrev;
+    }
+
 
 }
