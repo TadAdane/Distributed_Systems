@@ -1,0 +1,7 @@
+/home/tadiwos/6th Semester/Distributed Systems/Labs/GitLabs/Lab_2/bankapp/src/main/java/com/example/bankapp/BankappApplication.java
+/home/tadiwos/6th Semester/Distributed Systems/Labs/GitLabs/Lab_2/bankapp/src/main/java/com/example/bankapp/ServletInitializer.java
+/home/tadiwos/6th Semester/Distributed Systems/Labs/GitLabs/Lab_2/bankapp/src/main/java/com/example/bankapp/controller/BankController.java
+/home/tadiwos/6th Semester/Distributed Systems/Labs/GitLabs/Lab_2/bankapp/src/main/java/com/example/bankapp/controller/HomeController.java
+/home/tadiwos/6th Semester/Distributed Systems/Labs/GitLabs/Lab_2/bankapp/src/main/java/com/example/bankapp/model/BankAccount.java
+/home/tadiwos/6th Semester/Distributed Systems/Labs/GitLabs/Lab_2/bankapp/src/main/java/com/example/bankapp/repository/BankRepository.java
+/home/tadiwos/6th Semester/Distributed Systems/Labs/GitLabs/Lab_2/bankapp/src/main/java/com/example/bankapp/service/BankService.java
