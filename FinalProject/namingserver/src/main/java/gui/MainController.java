@@ -35,6 +35,7 @@ public class MainController {
 
     private final NodeApp app = new NodeApp();
     private static int nodeCreationIndex = 1;
+    private final String namingServerIP = "172.21.0.3"; // example IP
 
 
     @FXML
@@ -113,7 +114,7 @@ public class MainController {
                     }
                     """, name, port, localPath, replicaPath);
 
-            String namingServerIP = "localhost";  // or use actual IP of G4c1.6dist
+            //String namingServerIP = "localhost";  // or use actual IP of G4c1.6dist
             URL url = new URL("http://" + namingServerIP + ":8080/addNode");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -180,7 +181,7 @@ public class MainController {
 
     private int fetchNodeCountFromServer() {
         try {
-            URL url = new URL("http://localhost:8080/nodeCount");  // Use IP if on remote G4c1
+            URL url = new URL("http://" + namingServerIP + ":8080/nodeCount");  // Use IP if on remote G4c1
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -231,7 +232,7 @@ public class MainController {
     @FXML
     private void handleFetchNodes() {
         try {
-            URL url = new URL("http://localhost:8080/getAllNodes");
+            URL url = new URL("http://" + namingServerIP + ":8080/getAllNodes");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -299,7 +300,7 @@ public class MainController {
         fetchConfigForNode(selected.getName(), selected.getPort());
 
         try {
-            URL url = new URL("http://localhost:8080/getFilesForNode?nodeName=" + nodeName);
+            URL url = new URL("http://" + namingServerIP + ":8080/getFilesForNode?nodeName=" + nodeName);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -449,7 +450,7 @@ public class MainController {
     //fetching the node names by hash
     private String fetchNodeNameByHash(int hash) {
         try {
-            URL url = new URL("http://localhost:8080/getNodeName?hash=" + hash);
+            URL url = new URL("http://" + namingServerIP + ":8080/getNodeName?hash=" + hash);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -479,7 +480,7 @@ public class MainController {
 
     private void fetchConfigForNode(String nodeName, int nodePort) {
         try {
-            URL url = new URL("http://localhost:8080/neighbors?port=" + nodePort);
+            URL url = new URL("http://" + namingServerIP + ":8080/neighbors?port=" + nodePort);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -516,59 +517,59 @@ public class MainController {
         return map;
     }
 
-// Removing Node
-@FXML
-private void handleShutdownNode() {
-    NodeDisplay selected = nodeTable.getSelectionModel().getSelectedItem();
-    if (selected == null) {
-        showAlert("Please select a node to shut down.");
-        return;
-    }
+    // Removing Node
+    @FXML
+    private void handleShutdownNode() {
+        NodeDisplay selected = nodeTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Please select a node to shut down.");
+            return;
+        }
 
-    // Run shutdown logic in background thread
-    new Thread(() -> {
-        try {
-            URL url = new URL("http://localhost:8080/removeNode");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("POST");
-            con.setDoOutput(true);
-            con.setRequestProperty("Content-Type", "application/json");
+        // Run shutdown logic in background thread
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://" + namingServerIP + ":8080/removeNode");
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("POST");
+                con.setDoOutput(true);
+                con.setRequestProperty("Content-Type", "application/json");
 
-            // Optional: Timeout settings to avoid hanging
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
+                // Optional: Timeout settings to avoid hanging
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
 
-            String jsonBody = String.format("""
+                String jsonBody = String.format("""
                 {
                     "name": "%s",
                     "port": %d
                 }
                 """, selected.getName(), selected.getPort());
 
-            try (OutputStream os = con.getOutputStream()) {
-                os.write(jsonBody.getBytes());
-            }
+                try (OutputStream os = con.getOutputStream()) {
+                    os.write(jsonBody.getBytes());
+                }
 
-            int code = con.getResponseCode();
-            if (code == 200) {
-                Platform.runLater(() -> {
-                    showAlert("Node shut down: " + selected.getName());
-                    handleFetchNodes();  // Refresh node list on GUI
-                });
-            } else {
+                int code = con.getResponseCode();
+                if (code == 200) {
+                    Platform.runLater(() -> {
+                        showAlert("Node shut down: " + selected.getName());
+                        handleFetchNodes();  // Refresh node list on GUI
+                    });
+                } else {
+                    Platform.runLater(() ->
+                            showAlert("Failed to shut down node (HTTP " + code + ")")
+                    );
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
                 Platform.runLater(() ->
-                        showAlert("Failed to shut down node (HTTP " + code + ")")
+                        showAlert("Error during shutdown: " + e.getMessage())
                 );
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Platform.runLater(() ->
-                    showAlert("Error during shutdown: " + e.getMessage())
-            );
-        }
-    }).start();
-}
+        }).start();
+    }
 
 
 }
