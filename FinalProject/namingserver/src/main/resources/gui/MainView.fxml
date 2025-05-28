@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="gui.MainController">
+            fx:controller="gui.MainController"
+            stylesheets="@style.css"
+            styleClass="root">
 
     <center>
-        <VBox spacing="15" style="-fx-padding: 20;">
+        <VBox spacing="15" alignment="TOP_CENTER" styleClass="content">
             <!-- Add Node Section -->
-            <HBox spacing="10">
-                <Label text="Node Name:" />
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Node Name:" styleClass="label"/>
                 <TextField fx:id="nodeNameField" promptText="Enter node name" />
-                <Label text="File Count:" />
+                <Label text="File Count:" styleClass="label"/>
                 <ChoiceBox fx:id="fileCountChoiceBox" />
                 <Button text="Add Node" onAction="#handleAddNode" />
                 <Button fx:id="shutdownButton" text="Shutdown Node" onAction="#handleShutdownNode"/>
-
             </HBox>
 
             <!-- Node Files Section -->
             <VBox spacing="10">
-                <Label text="Node Files"/>
-                <HBox spacing="10">
+                <Label text="Node Files" styleClass="section-title"/>
+                <HBox spacing="10" alignment="CENTER">
                     <VBox spacing="5">
-                        <Label text="Local Files"/>
+                        <Label text="Local Files" styleClass="label"/>
                         <ListView fx:id="localFileListView" prefHeight="150" prefWidth="200"/>
                     </VBox>
                     <VBox spacing="5">
-                        <Label text="Replica Files"/>
+                        <Label text="Replica Files" styleClass="label"/>
                         <ListView fx:id="replicaFileListView" prefHeight="150" prefWidth="200"/>
                     </VBox>
                 </HBox>
             </VBox>
 
-            <!-- Fetch Nodes Button -->
-            <HBox spacing="10">
+            <!-- Fetch Button -->
+            <HBox spacing="10" alignment="CENTER">
                 <Button text="Fetch Nodes" onAction="#handleFetchNodes" />
             </HBox>
 
-            <!-- Previous and Next Node -->
-            <HBox spacing="20">
+            <!-- Prev/Next IDs -->
+            <HBox spacing="20" alignment="CENTER">
                 <VBox>
-                    <Label text="Previous Node ID:" />
-                    <Label fx:id="prevIdLabel" text="-" />
+                    <Label text="Previous Node ID:" styleClass="label"/>
+                    <Label fx:id="prevIdLabel" text="-" styleClass="id-label"/>
                 </VBox>
                 <VBox>
-                    <Label text="Next Node ID:" />
-                    <Label fx:id="nextIdLabel" text="-" />
+                    <Label text="Next Node ID:" styleClass="label"/>
+                    <Label fx:id="nextIdLabel" text="-" styleClass="id-label"/>
                 </VBox>
             </HBox>
 
-
-            <!-- Table to show node details -->
+            <!-- Node Table -->
             <TableView fx:id="nodeTable" prefHeight="400" prefWidth="600">
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Node Name" prefWidth="200"/>
