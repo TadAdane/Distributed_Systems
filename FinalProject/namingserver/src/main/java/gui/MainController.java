@@ -93,7 +93,7 @@ public class MainController {
         int index = fetchNodeCountFromServer() + 1;
 //
 //        int index = Node.getTotalNodes();
-        String basePath = "~/Distributed_Systems/FinalProject/namingserver/src/main/resources/";
+        String basePath = "/root/Distributed_Systems/FinalProject/namingserver/src/main/resources/";
         String localPath = basePath + "files" + index + "/local";
         String replicaPath = basePath + "files" + index + "/replica";
 
